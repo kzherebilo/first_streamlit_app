@@ -37,14 +37,15 @@ try:
         streamlit.dataframe(back_f)
 except:
     streamlit.error()
-
-my_cnx = snowflake.connector.connect(**streamlit.secrets["snowflake"])
-my_cur = my_cnx.cursor()
-my_cur.execute("SELECT * FROM FRUIT_LOAD_LIST")
-my_data_rows = my_cur.fetchall()
+    
 streamlit.header("The fruit list contains:")
-streamlit.dataframe(my_data_rows)
 
-s_fruit_choice = streamlit.text_input('What fruit would you like?','Kiwi')
-streamlit.write('The user entered this ', s_fruit_choice)
+def get_fruit_list():
+    with my_cnx.cursor() as my_cur:
+        my_cur.execute("SELECT * FROM FRUIT_LOAD_LIST")
+        return my_data_rows = my_cur.fetchall()
 
+if streamlit.button('Get Fruit Load List'):
+    my_cnx = snowflake.connector.connect(**streamlit.secrets["snowflake"])
+    my_data_rows = get_fruit_list()
+    streamlit.dataframe(my_data_rows)
